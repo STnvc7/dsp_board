@@ -7,7 +7,7 @@ import numpy as np
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 n_cpus = os.cpu_count()
 _MAX_WORKERS = n_cpus // 2 if n_cpus is not None else 1
-_ENABLE_PARALLEL = True
+_ENABLE_PARALLEL = False
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 def set_max_workers(max_workers: int):
