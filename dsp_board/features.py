@@ -8,6 +8,7 @@ import numpy as np
 from dsp_board.transforms import stft
 from dsp_board import core
 from dsp_board.utils import channelize, to_numpy, from_numpy, fix_length
+from dsp_board.utils.parallelize import get_enable_parallel, set_enable_parallel
 
 ALPHA = {
     8000: 0.312,
@@ -202,12 +203,18 @@ def mel_generalized_cepstrum(
     frames = frames * blackman.unsqueeze(0)
     
     frames = to_numpy(frames*MAX_WAV_VALUE, np.float64)
+
+    # WARNING: sptk.mgcep slows down with threads. Do not parallelize.
+    is_enable = get_enable_parallel()
+    set_enable_parallel(False)
     mgc = core.sptk.mel_generalized_cepstrum(
         frames, 
         order=order, 
         alpha=alpha, 
         gamma=gamma
     )
+    set_enable_parallel(is_enable)
+    
     mgc = from_numpy(mgc, device=device, torch_dtype=torch.float32)
     mgc = mgc.permute(0, 2, 1)
     mgc = fix_length(mgc, math.ceil(x.shape[-1] / hop_size), -1)
