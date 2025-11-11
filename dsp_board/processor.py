@@ -147,22 +147,22 @@ class Processor:
             original_sample_rate=self.sample_rate,
             target_sample_rate=target_sample_rate
         )
-    def trim(self, x: torch.Tensor) -> torch.Tensor:
+    def trim(self, x: torch.Tensor, direction: Optional[Literal["forward", "backward", "both"]]=None) -> torch.Tensor:
         return preprocesses.trim(
             x,
             sample_rate=self.sample_rate,
-            direction=self.trim_direction,
+            direction=self.trim_direction if direction is None else direction,
             trigger_level=self.trim_trigger_level,
             trigger_time=self.trim_trigger_time
         )
-    def loudness_normalize(self, x: torch.Tensor) -> torch.Tensor:
+    def loudness_normalize(self, x: torch.Tensor, target_lufs: Optional[float]=None) -> torch.Tensor:
         return preprocesses.loudness_normalize(
             x,
             sample_rate=self.sample_rate,
-            target_lufs=self.target_lufs
+            target_lufs=self.target_lufs if target_lufs is None else target_lufs
         )
-    def peak_normalize(self, x: torch.Tensor) -> torch.Tensor:
+    def peak_normalize(self, x: torch.Tensor, target_db: Optional[float]=None) -> torch.Tensor:
         return preprocesses.peak_normalize(
             x,
-            target_db=self.target_db
+            target_db=self.target_db if target_db is None else target_db
         )
