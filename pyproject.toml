@@ -20,3 +20,5 @@ markers = [
     "world: tests that use WORLD",
     "cuda: tests that use CUDA",
 ]
+[tool.setuptools]
+packages = ["dsp_board"]
