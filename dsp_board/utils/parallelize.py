@@ -14,9 +14,15 @@ def set_max_workers(max_workers: int):
     global _MAX_WORKERS
     _MAX_WORKERS = max_workers
 
+def get_max_workers() -> int:
+    return _MAX_WORKERS
+
 def set_enable_parallel(enable_parallel: bool):
     global _ENABLE_PARALLEL
     _ENABLE_PARALLEL = enable_parallel
+
+def get_enable_parallel() -> bool:
+    return _ENABLE_PARALLEL
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 def parallelize(func: Callable) -> Callable:
