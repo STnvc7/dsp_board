@@ -22,4 +22,3 @@ markers = [
 ]
 [tool.setuptools.packages.find]
 include = ["dsp_board*"]
-exclude = ["jsut_sample*"]
