@@ -18,5 +18,5 @@ markers = [
     "torch: tests that use PyTorch",
     "sptk: tests that use SPTK",
     "world: tests that use WORLD",
-    "slow: tests that are slow",
+    "cuda: tests that use CUDA",
 ]
