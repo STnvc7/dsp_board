@@ -106,16 +106,15 @@ def loudness_normalize(
         torch.Tensor: Waveform with normalized loudness with shape (B?, L).
     """
     normalized = []
-    for i in range(x.shape[-1]):
-        _x = x[i][None, :]
-        input_lufs = torchaudio.functional.loudness(x, sample_rate)
+    for i in range(x.shape[0]):
+        _x = x[i].unsqueeze(0)
+        input_lufs = torchaudio.functional.loudness(_x, sample_rate)
         delta_lufs = target_lufs - input_lufs
         gain = torch.pow(10.0, delta_lufs / 20.0)
         _x = _x * gain
-        normalized += [_x]
+        normalized += [_x.squeeze(0)]
         
     normalized = torch.stack(normalized, dim=0)
-
     return normalized
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
