@@ -7,7 +7,8 @@ import numpy as np
 
 from dsp_board.transforms import stft
 from dsp_board import core
-from dsp_board.utils import channelize, to_numpy, from_numpy, fix_length
+from dsp_board.utils.channelize import channelize
+from dsp_board.utils.tensor import to_numpy, from_numpy, fix_length
 from dsp_board.utils.parallelize import get_enable_parallel, set_enable_parallel
 
 ALPHA = {

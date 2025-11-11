@@ -2,7 +2,8 @@ from typing import Optional
 import torch
 import torch.nn.functional as F
 import math
-from dsp_board.utils import channelize, fix_length
+from dsp_board.utils.channelize import channelize
+from dsp_board.utils.tensor import fix_length
 
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @channelize(keep_dims=1)

@@ -2,7 +2,7 @@ from typing import Literal
 import torch
 import torchaudio
 
-from dsp_board.utils import channelize
+from dsp_board.utils.channelize import channelize
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @channelize(keep_dims=1)

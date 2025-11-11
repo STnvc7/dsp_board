@@ -1,6 +1,6 @@
 import numpy as np
 import pysptk
-from dsp_board.utils import parallelize
+from dsp_board.utils.parallelize import parallelize
 
 @parallelize
 def mel_cepstrum(sp: np.ndarray, order: int, alpha: float):

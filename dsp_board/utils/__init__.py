@@ -1,11 +1,9 @@
-from .channelize import channelize
-from .tensor import to_numpy, from_numpy, fix_length
-from .parallelize import parallelize
+from . import channelize
+from . import tensor
+from . import parallelize
 
 __all__ = [
     'channelize',
-    'to_numpy',
-    'from_numpy',
-    'fix_length',
+    'tensor',
     'parallelize'
 ]

@@ -2,7 +2,7 @@ from typing import Literal
 import numpy as np
 import pyworld as pw
 
-from dsp_board.utils import parallelize
+from dsp_board.utils.parallelize import parallelize
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @parallelize

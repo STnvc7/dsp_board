@@ -3,7 +3,7 @@ import pytest
 
 import torch
 from dsp_board import Processor
-from dsp_board.utils import fix_length
+from dsp_board.utils.tensor import fix_length
 
 @pytest.mark.torch
 @pytest.mark.parametrize("dim", [1, 2, 3])
