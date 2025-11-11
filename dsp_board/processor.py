@@ -138,7 +138,6 @@ class Processor:
         return features.vuv(
             x,
             sample_rate=self.sample_rate,
-            fft_size=self.fft_size,
             hop_size=self.hop_size,
             pitch_extract_method=self.pitch_extract_method,
         )
