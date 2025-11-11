@@ -413,7 +413,7 @@ def band_aperiodicity(
     device = x.device
 
     x_np = to_numpy(x, np.float64)
-    bap = core.world.aperiodicity(
+    bap = core.world.band_aperiodicity(
         x_np,
         sample_rate=sample_rate,
         fft_size=fft_size,
