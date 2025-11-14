@@ -113,6 +113,95 @@ def mel_spectrogram(
     mel_spc = fix_length(mel_spc, math.ceil(x.shape[-1] / hop_size), -1)
     
     return mel_spc
+    
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+@channelize(keep_dims=1)
+def linear_energy(
+    x: torch.Tensor,
+    fft_size: int,
+    hop_size: int,
+    window_size: Optional[int] = None,
+    power: bool = False,
+    log: bool = True,
+    eps: float = 1e-8,
+    reduction: Literal["sum", "mean"] = "sum",
+) -> torch.Tensor:
+    """
+    Computes the per-frame energy from a linear spectrogram.
+
+    Args:
+        x (torch.Tensor): Input waveform of shape (B?, L).
+            - B? is an optional batch dimension from the input.
+            - L is the length of the input waveform.
+        fft_size (int): Number of FFT points (i.e., window length for FFT).
+        hop_size (int): Number of audio samples between adjacent STFT columns (frame shift).
+        window_size (Optional[int], optional): Length of the window function. If None, defaults to fft_size.
+        power (bool, optional): If True, returns power spectrogram (magnitude squared). If False, returns magnitude spectrogram. Defaults to True.
+        log (bool, optional): If True, applies logarithmic scaling to the output spectrogram. Defaults to False.
+        eps (float, optional): Small constant added to avoid log(0). Defaults to 1e-8.
+        reduction (Literal["sum", "mean"], optional): Reduction method to apply to the spectrogram. Defaults to "sum".
+
+    Returns:
+        torch.Tensor: Per-frame energy with shape (B?, 1, T)
+            - B? is the same as the input.
+            - T is the number of time frames.
+    """
+    spc = spectrogram(x, fft_size, hop_size, window_size, power, log, eps)
+    
+    if reduction == "sum":
+        energy = torch.sum(spc, dim=-2, keepdim=True)
+    elif reduction == "mean":
+        energy = torch.mean(spc, dim=-2, keepdim=True)
+    else:
+        raise ValueError(f"Invalid reduction method: {reduction}")
+    
+    return energy
+    
+# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+@channelize(keep_dims=1)
+def mel_energy(
+    x: torch.Tensor,
+    sample_rate: int,
+    fft_size: int,
+    hop_size: int,
+    n_mels: int = 80,
+    window_size: Optional[int] = None,
+    power: bool = False,
+    log: bool = True,
+    eps: float = 1e-8,
+    reduction: Literal["sum", "mean"] = "sum",
+) -> torch.Tensor:
+    """
+    Computes the per-frame energy from a mel spectrogram.
+
+    Args:
+        x (torch.Tensor): Input waveform of shape (B?, L).
+            - B? is an optional batch dimension from the input.
+            - L is the length of the input waveform.
+        sample_rate (int): Sampling rate of the input signal.
+        fft_size (int): FFT window size for computing the STFT.
+        hop_size (int): Number of samples between successive frames (frame shift).
+        n_mels (int): Number of mel filter banks to use.
+        window_size (Optional[int], optional): Window length for STFT. If None, defaults to `fft_size`.
+        log (bool, optional): Whether to apply log scaling to the mel spectrogram. Defaults to True.
+        eps (float, optional): Small constant added before taking log to avoid log(0). Defaults to 1e-8.
+        reduction (Literal["sum", "mean"], optional): Reduction method to apply to the spectrogram. Defaults to "sum".
+        
+    Returns:
+        torch.Tensor: Per-frame energy with shape (B?, 1, T).
+            - B? is the same as the input.
+            - T is the number of time frames.
+    """
+    mel_spc = mel_spectrogram(x, sample_rate,fft_size, hop_size, n_mels, window_size, power, log, eps)
+    
+    if reduction == "sum":
+        energy = torch.sum(mel_spc, dim=-2, keepdim=True)
+    elif reduction == "mean":
+        energy = torch.mean(mel_spc, dim=-2, keepdim=True)
+    else:
+        raise ValueError(f"Invalid reduction method: {reduction}")
+    
+    return energy
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @channelize(keep_dims=1)

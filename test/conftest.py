@@ -16,6 +16,7 @@ def dsp_processor():
         fft_size=1024,
         hop_size=256,
         window_size=1024,
+        energy_reduction="sum",
         n_mels=80,
         n_mfcc=13,
         n_mcep=39,

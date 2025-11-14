@@ -13,6 +13,7 @@ class Processor:
         fft_size: int,
         hop_size: int,
         window_size: Optional[int]=None,
+        energy_reduction: Literal["sum", "mean"] = "sum",
         n_mels: int=80,
         n_mfcc: int=13,
         n_mcep: int=39,
@@ -29,6 +30,7 @@ class Processor:
         self.fft_size = fft_size
         self.hop_size = hop_size
         self.window_size = window_size if window_size is not None else fft_size
+        self.energy_reduction = energy_reduction
         self.n_mels = n_mels
         self.n_mfcc = n_mfcc
         self.n_mcep = n_mcep
@@ -75,6 +77,29 @@ class Processor:
             window_size=self.window_size,
             log=True,
             eps=self.eps
+        )
+    def linear_energy(self, x: torch.Tensor, power=False, log=True):
+        return features.linear_energy(
+            x,
+            fft_size=self.fft_size,
+            hop_size=self.hop_size,
+            window_size=self.window_size,
+            power=power,
+            log=log,
+            eps=self.eps,
+            reduction=self.energy_reduction
+        )
+    def mel_energy(self, x):
+        return features.mel_energy(
+            x,
+            sample_rate=self.sample_rate,
+            fft_size=self.fft_size,
+            hop_size=self.hop_size,
+            n_mels=self.n_mels,
+            window_size=self.window_size,
+            log=True,
+            eps=self.eps,
+            reduction=self.energy_reduction
         )
     def mel_cepstrum(self, x):
         return features.mel_cepstrum(

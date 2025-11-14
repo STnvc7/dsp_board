@@ -7,7 +7,7 @@ from dsp_board import Processor, set_enable_parallel, set_max_workers
 @pytest.mark.torch
 @pytest.mark.parametrize("dim", [1, 2, 3])
 @pytest.mark.parametrize("device", ["cpu", "cuda"])
-@pytest.mark.parametrize("function", ["spectrogram", "mel_spectrogram", "mfcc"])
+@pytest.mark.parametrize("function", ["spectrogram", "mel_spectrogram", "linear_energy", "mel_energy", "mfcc"])
 def test_torch_feature(
     audio_tensor: Callable[[int, str], torch.Tensor], 
     dsp_processor: Processor, 
@@ -25,6 +25,8 @@ def test_torch_feature(
     n_bins = {
         "spectrogram": dsp_processor.fft_size // 2 + 1, 
         "mel_spectrogram": dsp_processor.n_mels, 
+        "linear_energy": 1,
+        "mel_energy": 1,
         "mfcc": dsp_processor.n_mfcc
     }
     
