@@ -67,7 +67,7 @@ class Processor:
             log=log,
             eps=self.eps
         )
-    def mel_spectrogram(self, x):
+    def mel_spectrogram(self, x: torch.Tensor):
         return features.mel_spectrogram(
             x,
             sample_rate=self.sample_rate,
@@ -89,7 +89,7 @@ class Processor:
             eps=self.eps,
             reduction=self.energy_reduction
         )
-    def mel_energy(self, x):
+    def mel_energy(self, x: torch.Tensor):
         return features.mel_energy(
             x,
             sample_rate=self.sample_rate,
@@ -101,7 +101,7 @@ class Processor:
             eps=self.eps,
             reduction=self.energy_reduction
         )
-    def mel_cepstrum(self, x):
+    def mel_cepstrum(self, x: torch.Tensor):
         return features.mel_cepstrum(
             x,
             sample_rate=self.sample_rate,
@@ -110,7 +110,7 @@ class Processor:
             order=self.n_mcep,
             pitch_extract_method=self.pitch_extract_method,
         )
-    def mel_generalized_cepstrum(self, x):
+    def mel_generalized_cepstrum(self, x: torch.Tensor):
         return features.mel_generalized_cepstrum(
             x,
             sample_rate=self.sample_rate,
