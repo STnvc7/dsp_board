@@ -7,7 +7,7 @@ from dsp_board import Processor
 
 SCRIPT_PATH = os.path.abspath(__file__)
 SCRIPT_DIR = os.path.dirname(SCRIPT_PATH)
-SAMPLE_ROOT = f"{SCRIPT_DIR}/../jsut_sample"
+SAMPLE_ROOT = f"{SCRIPT_DIR}/../samples"
 
 @pytest.fixture(scope="session")
 def dsp_processor():
