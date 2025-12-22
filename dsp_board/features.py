@@ -247,7 +247,6 @@ def mel_cepstrum(
         order=order, 
         alpha=alpha
     )
-    print(mcep.shape)
     mcep = from_numpy(mcep, device=device, torch_dtype=torch.float32)
     mcep = mcep.permute(0,2,1)
     mcep = fix_length(mcep, math.ceil(x.shape[-1] / hop_size), -1)
