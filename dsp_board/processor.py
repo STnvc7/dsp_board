@@ -30,7 +30,7 @@ class Processor:
         self.fft_size = fft_size
         self.hop_size = hop_size
         self.window_size = window_size if window_size is not None else fft_size
-        self.energy_reduction = energy_reduction
+        self.energy_reduction: Literal["sum", "mean"] = energy_reduction
         self.n_mels = n_mels
         self.n_mfcc = n_mfcc
         self.n_mcep = n_mcep
@@ -57,14 +57,44 @@ class Processor:
             hop_size=self.hop_size,
             window_size=self.window_size
         )
-    def spectrogram(self, x: torch.Tensor, power=False, log=True) -> torch.Tensor:
+    def linear_spectrogram(self, x: torch.Tensor) -> torch.Tensor:
         return features.spectrogram(
             x,
             fft_size=self.fft_size,
             hop_size=self.hop_size,
             window_size=self.window_size,
-            power=power,
-            log=log,
+            power=False,
+            log=False,
+            eps=self.eps
+        )
+    def power_spectrogram(self, x: torch.Tensor) -> torch.Tensor:
+        return features.spectrogram(
+            x,
+            fft_size=self.fft_size,
+            hop_size=self.hop_size,
+            window_size=self.window_size,
+            power=True,
+            log=False,
+            eps=self.eps
+        )
+    def log_spectrogram(self, x: torch.Tensor) -> torch.Tensor:
+        return features.spectrogram(
+            x,
+            fft_size=self.fft_size,
+            hop_size=self.hop_size,
+            window_size=self.window_size,
+            power=False,
+            log=True,
+            eps=self.eps
+        )
+    def log_power_spectrogram(self, x: torch.Tensor) -> torch.Tensor:
+        return features.spectrogram(
+            x,
+            fft_size=self.fft_size,
+            hop_size=self.hop_size,
+            window_size=self.window_size,
+            power=True,
+            log=True,
             eps=self.eps
         )
     def mel_spectrogram(self, x: torch.Tensor):
@@ -78,14 +108,14 @@ class Processor:
             log=True,
             eps=self.eps
         )
-    def linear_energy(self, x: torch.Tensor, power=False, log=True):
+    def energy(self, x: torch.Tensor):
         return features.linear_energy(
             x,
             fft_size=self.fft_size,
             hop_size=self.hop_size,
             window_size=self.window_size,
-            power=power,
-            log=log,
+            power=False,
+            log=True,
             eps=self.eps,
             reduction=self.energy_reduction
         )
