@@ -286,6 +286,7 @@ def mel_generalized_cepstrum(
     alpha = ALPHA.get(sample_rate, 0.466)
     gamma = -1.0 / stage
     
+    x = x + torch.rand_like(x) * 1e-6  # Add noise to avoid numerical instability
     MAX_WAV_VALUE = 32768.0
     frames = x.unfold(dimension=1, size=fft_size, step=hop_size)
     blackman = torch.blackman_window(fft_size, periodic=True, dtype=x.dtype, device=x.device)
