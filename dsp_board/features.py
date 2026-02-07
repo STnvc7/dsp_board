@@ -29,7 +29,6 @@ def spectrogram(
     fft_size: int,
     hop_size: int,
     window_size: Optional[int] = None,
-    power: bool = False,
     log: bool = False,
     eps: float = 1e-8,
 ) -> torch.Tensor:
@@ -43,7 +42,6 @@ def spectrogram(
         fft_size (int): Number of FFT points (i.e., window length for FFT).
         hop_size (int): Number of audio samples between adjacent STFT columns (frame shift).
         window_size (Optional[int], optional): Length of the window function. If None, defaults to fft_size.
-        power (bool, optional): If True, returns power spectrogram (magnitude squared). If False, returns magnitude spectrogram. Defaults to True.
         log (bool, optional): If True, applies logarithmic scaling to the output spectrogram. Defaults to False.
         eps (float, optional): Small constant added to avoid log(0). Defaults to 1e-8.
 
@@ -53,15 +51,38 @@ def spectrogram(
             - T is the number of time frames.
     """
     amp = stft(x, fft_size, hop_size, window_size)
-    amp = amp.abs().pow(2).clip(min=eps)
-    if power is False:
-        amp = amp.sqrt()
+    amp = amp.abs().pow(2).clip(min=eps).sqrt()
     if log:
         amp = amp.log()
-        
     amp = fix_length(amp, math.ceil(x.shape[-1] / hop_size), -1)
     
     return amp
+    
+@channelize(keep_dims=1)
+def phase_spectrogram(
+    x: torch.Tensor,
+    fft_size: int,
+    hop_size: int,
+    window_size: Optional[int] = None,
+) -> torch.Tensor:
+    """
+    Compute the phase spectrogram from an input waveform using STFT.
+
+    Args:
+        x (torch.Tensor): Input waveform of shape (B?, L).
+            - B? is an optional batch dimension from the input.
+            - L is the length of the input waveform.
+        fft_size (int): Number of FFT points (i.e., window length for FFT).
+        hop_size (int): Number of audio samples between adjacent STFT columns (frame shift).
+        window_size (Optional[int], optional): Length of the window function. If None, defaults to fft_size.
+
+    Returns:
+        torch.Tensor: Phase spectrogram with shape (B?, fft_size//2+1, T)
+            - B? is the same as the input.
+            - T is the number of time frames.
+    """
+    amp = stft(x, fft_size, hop_size, window_size)
+    return amp.angle()
 
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @channelize(keep_dims=1)
@@ -72,7 +93,6 @@ def mel_spectrogram(
     hop_size: int,
     n_mels: int = 80,
     window_size: Optional[int] = None,
-    power: bool = False,
     log: bool = True,
     eps: float = 1e-8,
 ) -> torch.Tensor:
@@ -96,7 +116,7 @@ def mel_spectrogram(
             - B? is the same as the input.
             - T is the number of time frames.
     """
-    spc = spectrogram(x, fft_size, hop_size, window_size, power=power, log=False)
+    spc = spectrogram(x, fft_size, hop_size, window_size, log=False, eps=eps)
     mel_filter = torchaudio.transforms.MelScale(
         n_mels=n_mels,
         sample_rate=sample_rate,
@@ -107,8 +127,7 @@ def mel_spectrogram(
     mel_spc = mel_filter(spc)
 
     if log:
-        mel_spc = torch.clamp(input=mel_spc, min=eps)
-        mel_spc = torch.log(mel_spc)
+        mel_spc = mel_spc.clip(min=eps).log()
         
     mel_spc = fix_length(mel_spc, math.ceil(x.shape[-1] / hop_size), -1)
     
@@ -121,7 +140,6 @@ def linear_energy(
     fft_size: int,
     hop_size: int,
     window_size: Optional[int] = None,
-    power: bool = False,
     log: bool = True,
     eps: float = 1e-8,
     reduction: Literal["sum", "mean"] = "sum",
@@ -136,7 +154,6 @@ def linear_energy(
         fft_size (int): Number of FFT points (i.e., window length for FFT).
         hop_size (int): Number of audio samples between adjacent STFT columns (frame shift).
         window_size (Optional[int], optional): Length of the window function. If None, defaults to fft_size.
-        power (bool, optional): If True, returns power spectrogram (magnitude squared). If False, returns magnitude spectrogram. Defaults to True.
         log (bool, optional): If True, applies logarithmic scaling to the output spectrogram. Defaults to False.
         eps (float, optional): Small constant added to avoid log(0). Defaults to 1e-8.
         reduction (Literal["sum", "mean"], optional): Reduction method to apply to the spectrogram. Defaults to "sum".
@@ -146,7 +163,7 @@ def linear_energy(
             - B? is the same as the input.
             - T is the number of time frames.
     """
-    spc = spectrogram(x, fft_size, hop_size, window_size, power, log, eps)
+    spc = spectrogram(x, fft_size, hop_size, window_size, log, eps)
     
     if reduction == "sum":
         energy = torch.sum(spc, dim=-2, keepdim=True)
@@ -166,7 +183,6 @@ def mel_energy(
     hop_size: int,
     n_mels: int = 80,
     window_size: Optional[int] = None,
-    power: bool = False,
     log: bool = True,
     eps: float = 1e-8,
     reduction: Literal["sum", "mean"] = "sum",
@@ -192,7 +208,7 @@ def mel_energy(
             - B? is the same as the input.
             - T is the number of time frames.
     """
-    mel_spc = mel_spectrogram(x, sample_rate,fft_size, hop_size, n_mels, window_size, power, log, eps)
+    mel_spc = mel_spectrogram(x, sample_rate,fft_size, hop_size, n_mels, window_size, log, eps)
     
     if reduction == "sum":
         energy = torch.sum(mel_spc, dim=-2, keepdim=True)

@@ -63,17 +63,6 @@ class Processor:
             fft_size=self.fft_size,
             hop_size=self.hop_size,
             window_size=self.window_size,
-            power=False,
-            log=False,
-            eps=self.eps
-        )
-    def power_spectrogram(self, x: torch.Tensor) -> torch.Tensor:
-        return features.spectrogram(
-            x,
-            fft_size=self.fft_size,
-            hop_size=self.hop_size,
-            window_size=self.window_size,
-            power=True,
             log=False,
             eps=self.eps
         )
@@ -83,19 +72,15 @@ class Processor:
             fft_size=self.fft_size,
             hop_size=self.hop_size,
             window_size=self.window_size,
-            power=False,
             log=True,
             eps=self.eps
         )
-    def log_power_spectrogram(self, x: torch.Tensor) -> torch.Tensor:
-        return features.spectrogram(
+    def phase_spectrogram(self, x: torch.Tensor) -> torch.Tensor:
+        return features.phase_spectrogram(
             x,
             fft_size=self.fft_size,
             hop_size=self.hop_size,
             window_size=self.window_size,
-            power=True,
-            log=True,
-            eps=self.eps
         )
     def mel_spectrogram(self, x: torch.Tensor):
         return features.mel_spectrogram(
@@ -108,13 +93,22 @@ class Processor:
             log=True,
             eps=self.eps
         )
-    def energy(self, x: torch.Tensor):
+    def linear_energy(self, x: torch.Tensor):
         return features.linear_energy(
             x,
             fft_size=self.fft_size,
             hop_size=self.hop_size,
             window_size=self.window_size,
-            power=False,
+            log=False,
+            eps=self.eps,
+            reduction=self.energy_reduction
+        )
+    def log_energy(self, x: torch.Tensor):
+        return features.linear_energy(
+            x,
+            fft_size=self.fft_size,
+            hop_size=self.hop_size,
+            window_size=self.window_size,
             log=True,
             eps=self.eps,
             reduction=self.energy_reduction
